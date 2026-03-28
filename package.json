@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "build": "webpack",
+    "build": "webpack && knex migrate:latest",
     "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --verbose --runInBand --forceExit",
     "db:migrate": "knex migrate:latest",
     "db:rollback": "knex migrate:rollback"

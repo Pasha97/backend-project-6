@@ -1,0 +1,14 @@
+{
+  "users": {
+    "existing": {
+      "email": "existing@example.com",
+      "password": "password123"
+    },
+    "new": {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "new@example.com",
+      "password": "newpass123"
+    }
+  }
+}

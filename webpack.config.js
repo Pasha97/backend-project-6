@@ -1,5 +1,5 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const path = require('path');
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import path from 'path';
 
 module.exports = {
   mode: 'development',

@@ -15,12 +15,23 @@ html(lang="ru")
           ul.navbar-nav.justify-content-end.w-100
             li.nav-item.me-auto
               a.nav-link(href="/users") #{t('users')}
-            li.nav-item
-              a.nav-link(href="/session/new") #{t('signIn')}
-            li.nav-item
-              a.nav-link(href="/users/new") #{t('signUp')}
+            if currentUser
+              li.nav-item
+                a.nav-link(href=`/users/${currentUser.id}/edit`) #{currentUser.fullName}
+              li.nav-item
+                form(action="/session" method="post")
+                  input(type="hidden" name="_method" value="DELETE")
+                  button.nav-link.btn.btn-link(type="submit") #{t('signOut')}
+            else
+              li.nav-item
+                a.nav-link(href="/session/new") #{t('signIn')}
+              li.nav-item
+                a.nav-link(href="/users/new") #{t('signUp')}
     .container.wrapper.flex-grow-1
       h1.display-4.fw-bold.mt-4
+        block title
+      if flash && flash.message
+        .alert(class=`alert-${flash.type}`) #{flash.message}
       block content
     footer.bg-dark.text-light
       .container.py-3

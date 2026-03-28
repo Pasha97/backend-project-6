@@ -1,0 +1,28 @@
+extends ../layout.pug
+
+block title
+  | #{t('usersTitle')}
+
+block content
+  .table-responsive
+    table.table.table-borderless.table-striped.mt-5.bg-white
+      thead
+        tr
+          th #{t('id')}
+          th #{t('fullName')}
+          th #{t('email')}
+          th #{t('createdAt')}
+          th #{t('actions')}
+      tbody
+        each user in users
+          tr
+            td #{user.id}
+            td #{user.fullName}
+            td #{user.email}
+            td #{new Date(user.created_at).toLocaleDateString('ru-RU')}
+            td
+              if currentUser && String(currentUser.id) === String(user.id)
+                a.me-2(href=`/users/${user.id}/edit`) #{t('editLink')}
+                form.d-inline(action=`/users/${user.id}` method="post")
+                  input(type="hidden" name="_method" value="DELETE")
+                  button.btn.btn-link.p-0.text-danger(type="submit") #{t('deleteButton')}

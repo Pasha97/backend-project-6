@@ -1,0 +1,51 @@
+extends ../layout.pug
+
+block title
+  | #{t('editTaskTitle')}
+
+block content
+  .row.justify-content-center
+    .col-12.col-md-8
+      form(action=`/tasks/${task.id}` method="post")
+        input(type="hidden" name="_method" value="PATCH")
+        .form-floating.mb-3
+          input.form-control(
+            class=errors && errors.name ? 'is-invalid' : ''
+            id="data_name"
+            name="data[name]"
+            value=data && data.name || ''
+            placeholder=t('taskName')
+            type="text"
+          )
+          if errors && errors.name
+            .invalid-feedback.form-control-feedback #{errors.name[0]}
+          label(for="data_name") #{t('taskName')}
+        .mb-3
+          label.form-label(for="data_description") #{t('taskDescription')}
+          textarea.form-control(
+            id="data_description"
+            name="data[description]"
+            rows="3"
+          ) #{data && data.description || ''}
+        .mb-3
+          label.form-label(for="data_statusId") #{t('taskStatus')}
+          select.form-select(
+            class=errors && errors.statusId ? 'is-invalid' : ''
+            id="data_statusId"
+            name="data[statusId]"
+          )
+            option(value="") ---
+            each status in statuses
+              option(value=status.id selected=(data && String(data.statusId) === String(status.id))) #{status.name}
+          if errors && errors.statusId
+            .invalid-feedback #{errors.statusId[0]}
+        .mb-3
+          label.form-label(for="data_executorId") #{t('taskExecutor')}
+          select.form-select(
+            id="data_executorId"
+            name="data[executorId]"
+          )
+            option(value="") ---
+            each user in users
+              option(value=user.id selected=(data && String(data.executorId) === String(user.id))) #{user.fullName}
+        input.btn.btn-primary(type="submit" value=t('save'))

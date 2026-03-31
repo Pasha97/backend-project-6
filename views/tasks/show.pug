@@ -1,0 +1,22 @@
+extends ../layout.pug
+
+block title
+  | #{task.name}
+
+block content
+  p
+    strong #{t('taskStatus')}:
+    |  #{task.status ? task.status.name : ''}
+  p
+    strong #{t('taskCreator')}:
+    |  #{task.creator ? task.creator.fullName : ''}
+  p
+    strong #{t('taskExecutor')}:
+    |  #{task.executor ? task.executor.fullName : ''}
+  if task.description
+    p
+      strong #{t('taskDescription')}:
+      |  #{task.description}
+  p
+    strong #{t('createdAt')}:
+    |  #{new Date(task.created_at).toLocaleDateString('ru-RU')}

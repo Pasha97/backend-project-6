@@ -11,6 +11,7 @@ const getFixtureData = (filename) => JSON.parse(readFixture(filename));
 export const getTestData = () => getFixtureData('testData.json');
 
 export const prepareData = async () => {
+  await db('tasks').truncate();
   await db('task_statuses').truncate();
   await db('users').truncate();
   const users = getFixtureData('users.json');

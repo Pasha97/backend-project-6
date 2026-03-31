@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import i18next from 'i18next';
 import User from '../models/User.js';
+import Task from '../models/Task.js';
 
 const t = i18next.t.bind(i18next);
 
@@ -101,6 +102,14 @@ const usersRoutes = async (app) => {
     }
 
     if (_method === 'DELETE') {
+      const linked = await Task.query()
+        .where('creatorId', request.params.id)
+        .orWhere('executorId', request.params.id)
+        .first();
+      if (linked) {
+        request.session.flash = { type: 'danger', message: t('flash.userDeleteError') };
+        return reply.redirect('/users');
+      }
       await User.query().deleteById(request.params.id);
       delete request.session.userId;
       request.session.flash = { type: 'success', message: t('flash.userDeleted') };

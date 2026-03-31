@@ -1,0 +1,36 @@
+extends ../layout.pug
+
+block title
+  | #{t('tasksTitle')}
+
+block content
+  if currentUser
+    a.btn.btn-primary.mt-4.mb-3(href="/tasks/new") #{t('newTaskTitle')}
+  .table-responsive
+    table.table.table-borderless.table-striped.mt-1.bg-white
+      thead
+        tr
+          th #{t('id')}
+          th #{t('taskName')}
+          th #{t('taskStatus')}
+          th #{t('taskCreator')}
+          th #{t('taskExecutor')}
+          th #{t('createdAt')}
+          th #{t('actions')}
+      tbody
+        each task in tasks
+          tr
+            td #{task.id}
+            td
+              a(href=`/tasks/${task.id}`) #{task.name}
+            td #{task.status ? task.status.name : ''}
+            td #{task.creator ? task.creator.fullName : ''}
+            td #{task.executor ? task.executor.fullName : ''}
+            td #{new Date(task.created_at).toLocaleDateString('ru-RU')}
+            td
+              if currentUser
+                a.me-2(href=`/tasks/${task.id}/edit`) #{t('editLink')}
+                if String(currentUser.id) === String(task.creatorId)
+                  form.d-inline(action=`/tasks/${task.id}` method="post")
+                    input(type="hidden" name="_method" value="DELETE")
+                    button.btn.btn-link.p-0.text-danger(type="submit") #{t('deleteButton')}

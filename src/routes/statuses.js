@@ -1,5 +1,6 @@
 import i18next from 'i18next';
 import TaskStatus from '../models/TaskStatus.js';
+import Task from '../models/Task.js';
 
 const t = i18next.t.bind(i18next);
 
@@ -76,6 +77,11 @@ const statusesRoutes = async (app) => {
     const { _method, data = {} } = request.body ?? {};
 
     if (_method === 'DELETE') {
+      const linked = await Task.query().where('statusId', request.params.id).first();
+      if (linked) {
+        request.session.flash = { type: 'danger', message: t('flash.statusDeleteError') };
+        return reply.redirect('/statuses');
+      }
       await TaskStatus.query().deleteById(request.params.id);
       request.session.flash = { type: 'success', message: t('flash.statusDeleted') };
       return reply.redirect('/statuses');

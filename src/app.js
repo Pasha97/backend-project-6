@@ -15,6 +15,7 @@ import db from './db.js';
 import User from './models/User.js';
 import usersRoutes from './routes/users.js';
 import sessionRoutes from './routes/session.js';
+import statusesRoutes from './routes/statuses.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -79,6 +80,7 @@ const buildApp = (options = {}) => {
 
   app.register(usersRoutes);
   app.register(sessionRoutes);
+  app.register(statusesRoutes);
 
   app.get('/', (request, reply) => {
     reply.view('index.pug', {

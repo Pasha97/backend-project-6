@@ -10,5 +10,13 @@
       "email": "new@example.com",
       "password": "newpass123"
     }
+  },
+  "statuses": {
+    "existing": {
+      "name": "Новый"
+    },
+    "new": {
+      "name": "В работе"
+    }
   }
 }

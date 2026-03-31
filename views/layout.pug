@@ -13,8 +13,10 @@ html(lang="ru")
           span.navbar-toggler-icon
         #navbarToggleExternalContent.collapse.navbar-collapse
           ul.navbar-nav.justify-content-end.w-100
-            li.nav-item.me-auto
+            li.nav-item
               a.nav-link(href="/users") #{t('users')}
+            li.nav-item.me-auto
+              a.nav-link(href="/statuses") #{t('statuses')}
             if currentUser
               li.nav-item
                 a.nav-link(href=`/users/${currentUser.id}/edit`) #{currentUser.fullName}

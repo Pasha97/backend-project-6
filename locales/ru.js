@@ -1,6 +1,7 @@
 export default {
   appName: 'Менеджер задач',
   users: 'Пользователи',
+  statuses: 'Статусы',
   signIn: 'Вход',
   signUp: 'Регистрация',
   signOut: 'Выход',
@@ -13,7 +14,11 @@ export default {
   signUpTitle: 'Регистрация',
   editUserTitle: 'Изменение пользователя',
   usersTitle: 'Пользователи',
+  statusesTitle: 'Статусы',
+  newStatusTitle: 'Создание статуса',
+  editStatusTitle: 'Изменение статуса',
   // Form labels
+  statusName: 'Наименование',
   firstName: 'Имя',
   lastName: 'Фамилия',
   email: 'Email',
@@ -38,4 +43,9 @@ export default {
   'flash.signedOut': 'Вы разлогинены!',
   'flash.signInError': 'Неправильный емейл или пароль',
   'flash.accessDenied': 'Нет доступа',
+  'flash.statusCreated': 'Статус успешно создан',
+  'flash.statusUpdated': 'Статус успешно изменён',
+  'flash.statusDeleted': 'Статус успешно удалён',
+  'flash.statusCreateError': 'Не удалось создать статус',
+  'flash.statusUpdateError': 'Не удалось изменить статус',
 };

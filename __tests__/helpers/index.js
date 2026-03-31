@@ -11,10 +11,15 @@ const getFixtureData = (filename) => JSON.parse(readFixture(filename));
 export const getTestData = () => getFixtureData('testData.json');
 
 export const prepareData = async () => {
+  await db('task_statuses').truncate();
   await db('users').truncate();
   const users = getFixtureData('users.json');
   for (const user of users) {
     const { password, ...rest } = user;
     await db('users').insert({ ...rest, passwordDigest: await bcrypt.hash(password, 10) });
+  }
+  const statuses = getFixtureData('statuses.json');
+  for (const status of statuses) {
+    await db('task_statuses').insert(status);
   }
 };

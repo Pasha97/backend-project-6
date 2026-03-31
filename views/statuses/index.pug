@@ -1,0 +1,28 @@
+extends ../layout.pug
+
+block title
+  | #{t('statusesTitle')}
+
+block content
+  if currentUser
+    a.btn.btn-primary.mt-4.mb-3(href="/statuses/new") #{t('newStatusTitle')}
+  .table-responsive
+    table.table.table-borderless.table-striped.mt-1.bg-white
+      thead
+        tr
+          th #{t('id')}
+          th #{t('statusName')}
+          th #{t('createdAt')}
+          th #{t('actions')}
+      tbody
+        each status in statuses
+          tr
+            td #{status.id}
+            td #{status.name}
+            td #{new Date(status.created_at).toLocaleDateString('ru-RU')}
+            td
+              if currentUser
+                a.me-2(href=`/statuses/${status.id}/edit`) #{t('editLink')}
+                form.d-inline(action=`/statuses/${status.id}` method="post")
+                  input(type="hidden" name="_method" value="DELETE")
+                  button.btn.btn-link.p-0.text-danger(type="submit") #{t('deleteButton')}

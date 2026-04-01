@@ -11,8 +11,10 @@ const getFixtureData = (filename) => JSON.parse(readFixture(filename));
 export const getTestData = () => getFixtureData('testData.json');
 
 export const prepareData = async () => {
+  await db('task_labels').truncate();
   await db('tasks').truncate();
   await db('task_statuses').truncate();
+  await db('labels').truncate();
   await db('users').truncate();
   const users = getFixtureData('users.json');
   for (const user of users) {
@@ -22,5 +24,9 @@ export const prepareData = async () => {
   const statuses = getFixtureData('statuses.json');
   for (const status of statuses) {
     await db('task_statuses').insert(status);
+  }
+  const labels = getFixtureData('labels.json');
+  for (const label of labels) {
+    await db('labels').insert(label);
   }
 };

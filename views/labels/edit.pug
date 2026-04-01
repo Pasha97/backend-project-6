@@ -1,0 +1,23 @@
+extends ../layout.pug
+
+block title
+  | #{t('editLabelTitle')}
+
+block content
+  .row.justify-content-center
+    .col-12.col-md-8
+      form(action=`/labels/${label.id}` method="post")
+        input(type="hidden" name="_method" value="PATCH")
+        .form-floating.mb-3
+          input.form-control(
+            class=errors && errors.name ? 'is-invalid' : ''
+            id="data_name"
+            name="data[name]"
+            value=data && data.name || ''
+            placeholder=t('labelName')
+            type="text"
+          )
+          if errors && errors.name
+            .invalid-feedback.form-control-feedback #{errors.name[0]}
+          label(for="data_name") #{t('labelName')}
+        input.btn.btn-primary(type="submit" value=t('save'))

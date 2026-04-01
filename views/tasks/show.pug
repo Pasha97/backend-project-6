@@ -13,6 +13,10 @@ block content
   p
     strong #{t('taskExecutor')}:
     |  #{task.executor ? task.executor.fullName : ''}
+  if task.labels && task.labels.length > 0
+    p
+      strong #{t('taskLabels')}:
+      |  #{task.labels.map(l => l.name).join(', ')}
   if task.description
     p
       strong #{t('taskDescription')}:

@@ -2,6 +2,7 @@ import i18next from 'i18next';
 import Task from '../models/Task.js';
 import TaskStatus from '../models/TaskStatus.js';
 import User from '../models/User.js';
+import Label from '../models/Label.js';
 
 const t = i18next.t.bind(i18next);
 
@@ -25,6 +26,12 @@ const requireAuth = (request, reply) => {
   return true;
 };
 
+const normalizeIds = (val) => {
+  if (!val) return [];
+  const arr = Array.isArray(val) ? val : [val];
+  return arr.map(Number).filter(Boolean);
+};
+
 const tasksRoutes = async (app) => {
   app.get('/tasks', async (request, reply) => {
     const tasks = await Task.query()
@@ -39,15 +46,17 @@ const tasksRoutes = async (app) => {
 
   app.get('/tasks/new', async (request, reply) => {
     if (!requireAuth(request, reply)) return;
-    const [statuses, users] = await Promise.all([
+    const [statuses, users, labels] = await Promise.all([
       TaskStatus.query().orderBy('id'),
       User.query().orderBy('id'),
+      Label.query().orderBy('id'),
     ]);
     return reply.view('tasks/new.pug', {
       errors: {},
       data: {},
       statuses,
       users,
+      labels,
       currentUser: request.currentUser,
       flash: request.flash,
     });
@@ -59,27 +68,35 @@ const tasksRoutes = async (app) => {
     const errors = validate(data);
 
     if (Object.keys(errors).length > 0) {
-      const [statuses, users] = await Promise.all([
+      const [statuses, users, labels] = await Promise.all([
         TaskStatus.query().orderBy('id'),
         User.query().orderBy('id'),
+        Label.query().orderBy('id'),
       ]);
       return reply.status(422).view('tasks/new.pug', {
         errors,
         data,
         statuses,
         users,
+        labels,
         currentUser: request.currentUser,
         flash: { type: 'danger', message: t('flash.taskCreateError') },
       });
     }
 
-    await Task.query().insert({
+    const task = await Task.query().insertAndFetch({
       name: data.name,
       description: data.description || null,
       statusId: Number(data.statusId),
       creatorId: request.currentUser.id,
       executorId: data.executorId ? Number(data.executorId) : null,
     });
+
+    const labelIds = normalizeIds(data.labelIds);
+    if (labelIds.length > 0) {
+      await task.$relatedQuery('labels').relate(labelIds);
+    }
+
     request.session.flash = { type: 'success', message: t('flash.taskCreated') };
     return reply.redirect('/tasks');
   });
@@ -87,7 +104,7 @@ const tasksRoutes = async (app) => {
   app.get('/tasks/:id', async (request, reply) => {
     const task = await Task.query()
       .findById(request.params.id)
-      .withGraphFetched('[status, creator, executor]');
+      .withGraphFetched('[status, creator, executor, labels]');
     return reply.view('tasks/show.pug', {
       task,
       currentUser: request.currentUser,
@@ -97,10 +114,11 @@ const tasksRoutes = async (app) => {
 
   app.get('/tasks/:id/edit', async (request, reply) => {
     if (!requireAuth(request, reply)) return;
-    const [task, statuses, users] = await Promise.all([
-      Task.query().findById(request.params.id),
+    const [task, statuses, users, labels] = await Promise.all([
+      Task.query().findById(request.params.id).withGraphFetched('labels'),
       TaskStatus.query().orderBy('id'),
       User.query().orderBy('id'),
+      Label.query().orderBy('id'),
     ]);
     return reply.view('tasks/edit.pug', {
       task,
@@ -108,6 +126,7 @@ const tasksRoutes = async (app) => {
       data: task,
       statuses,
       users,
+      labels,
       currentUser: request.currentUser,
       flash: request.flash,
     });
@@ -131,10 +150,11 @@ const tasksRoutes = async (app) => {
     if (_method === 'PATCH') {
       const errors = validate(data);
       if (Object.keys(errors).length > 0) {
-        const [task, statuses, users] = await Promise.all([
-          Task.query().findById(request.params.id),
+        const [task, statuses, users, labels] = await Promise.all([
+          Task.query().findById(request.params.id).withGraphFetched('labels'),
           TaskStatus.query().orderBy('id'),
           User.query().orderBy('id'),
+          Label.query().orderBy('id'),
         ]);
         return reply.status(422).view('tasks/edit.pug', {
           task,
@@ -142,17 +162,25 @@ const tasksRoutes = async (app) => {
           data,
           statuses,
           users,
+          labels,
           currentUser: request.currentUser,
           flash: { type: 'danger', message: t('flash.taskUpdateError') },
         });
       }
 
-      await Task.query().patchAndFetchById(request.params.id, {
+      const task = await Task.query().patchAndFetchById(request.params.id, {
         name: data.name,
         description: data.description || null,
         statusId: Number(data.statusId),
         executorId: data.executorId ? Number(data.executorId) : null,
       });
+
+      await task.$relatedQuery('labels').unrelate();
+      const labelIds = normalizeIds(data.labelIds);
+      if (labelIds.length > 0) {
+        await task.$relatedQuery('labels').relate(labelIds);
+      }
+
       request.session.flash = { type: 'success', message: t('flash.taskUpdated') };
       return reply.redirect('/tasks');
     }

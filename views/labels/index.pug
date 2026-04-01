@@ -1,0 +1,28 @@
+extends ../layout.pug
+
+block title
+  | #{t('labelsTitle')}
+
+block content
+  if currentUser
+    a.btn.btn-primary.mt-4.mb-3(href="/labels/new") #{t('newLabelTitle')}
+  .table-responsive
+    table.table.table-borderless.table-striped.mt-1.bg-white
+      thead
+        tr
+          th #{t('id')}
+          th #{t('labelName')}
+          th #{t('createdAt')}
+          th #{t('actions')}
+      tbody
+        each label in labels
+          tr
+            td #{label.id}
+            td #{label.name}
+            td #{new Date(label.created_at).toLocaleDateString('ru-RU')}
+            td
+              if currentUser
+                a.me-2(href=`/labels/${label.id}/edit`) #{t('editLink')}
+                form.d-inline(action=`/labels/${label.id}` method="post")
+                  input(type="hidden" name="_method" value="DELETE")
+                  button.btn.btn-link.p-0.text-danger(type="submit") #{t('deleteButton')}

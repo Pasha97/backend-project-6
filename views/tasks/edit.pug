@@ -48,4 +48,14 @@ block content
             option(value="") ---
             each user in users
               option(value=user.id selected=(data && String(data.executorId) === String(user.id))) #{user.fullName}
+        .mb-3
+          label.form-label(for="data_labelIds") #{t('taskLabels')}
+          select.form-select(
+            id="data_labelIds"
+            name="data[labelIds]"
+            multiple
+          )
+            each label in labels
+              - const selectedIds = task && task.labels ? task.labels.map(l => l.id) : []
+              option(value=label.id selected=selectedIds.includes(label.id)) #{label.name}
         input.btn.btn-primary(type="submit" value=t('save'))

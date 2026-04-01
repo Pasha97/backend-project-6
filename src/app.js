@@ -17,6 +17,7 @@ import usersRoutes from './routes/users.js';
 import sessionRoutes from './routes/session.js';
 import statusesRoutes from './routes/statuses.js';
 import tasksRoutes from './routes/tasks.js';
+import labelsRoutes from './routes/labels.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -28,7 +29,14 @@ const parseFormBody = (str) => {
     const match = key.match(/^(\w+)\[(\w+)\]$/);
     if (match) {
       if (!result[match[1]]) result[match[1]] = {};
-      result[match[1]][match[2]] = value;
+      const existing = result[match[1]][match[2]];
+      if (existing === undefined) {
+        result[match[1]][match[2]] = value;
+      } else {
+        result[match[1]][match[2]] = Array.isArray(existing)
+          ? [...existing, value]
+          : [existing, value];
+      }
     } else {
       result[key] = value;
     }
@@ -83,6 +91,7 @@ const buildApp = (options = {}) => {
   app.register(sessionRoutes);
   app.register(statusesRoutes);
   app.register(tasksRoutes);
+  app.register(labelsRoutes);
 
   app.get('/', (request, reply) => {
     reply.view('index.pug', {

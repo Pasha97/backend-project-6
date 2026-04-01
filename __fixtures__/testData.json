@@ -24,5 +24,9 @@
       "name": "Новая задача",
       "description": "Описание задачи"
     }
+  },
+  "labels": {
+    "existing": { "name": "feature" },
+    "new": { "name": "bug" }
   }
 }

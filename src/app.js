@@ -9,6 +9,7 @@ import fastifySession from '@fastify/session';
 import pug from 'pug';
 import i18next from 'i18next';
 import { Model } from 'objection';
+import Rollbar from 'rollbar';
 
 import ru from '../locales/ru.js';
 import db from './db.js';
@@ -54,7 +55,10 @@ if (!i18next.isInitialized) {
 }
 
 const buildApp = (options = {}) => {
-  const app = Fastify(options);
+  const app = Fastify({
+    ...options,
+    routerOptions: { querystringParser: parseFormBody, ...options.routerOptions },
+  });
 
   Model.knex(db);
 
@@ -86,6 +90,20 @@ const buildApp = (options = {}) => {
     const userId = request.session?.userId;
     request.currentUser = userId ? await User.query().findById(userId) : null;
   });
+
+  if (process.env.ROLLBAR_ACCESS_TOKEN) {
+    const rollbar = new Rollbar({
+      accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
+      environment: process.env.ROLLBAR_ENVIRONMENT ?? 'production',
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+    });
+
+    app.setErrorHandler((err, request, reply) => {
+      rollbar.error(err, request.raw);
+      reply.status(err.statusCode ?? 500).send(err);
+    });
+  }
 
   app.register(usersRoutes);
   app.register(sessionRoutes);

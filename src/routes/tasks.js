@@ -34,11 +34,40 @@ const normalizeIds = (val) => {
 
 const tasksRoutes = async (app) => {
   app.get('/tasks', async (request, reply) => {
-    const tasks = await Task.query()
-      .withGraphFetched('[status, creator, executor]')
-      .orderBy('id');
+    const filter = request.query?.filter ?? {};
+
+    const [statuses, users, labels] = await Promise.all([
+      TaskStatus.query().orderBy('id'),
+      User.query().orderBy('id'),
+      Label.query().orderBy('id'),
+    ]);
+
+    let query = Task.query()
+      .withGraphFetched('[status, creator, executor, labels]')
+      .orderBy('tasks.id');
+
+    if (filter.statusId) {
+      query = query.where('tasks.statusId', filter.statusId);
+    }
+    if (filter.executorId) {
+      query = query.where('tasks.executorId', filter.executorId);
+    }
+    if (filter.labelId) {
+      query = query.whereExists(
+        Task.relatedQuery('labels').where('labels.id', filter.labelId),
+      );
+    }
+    if (filter.isCreatorUser && request.currentUser) {
+      query = query.where('tasks.creatorId', request.currentUser.id);
+    }
+
+    const tasks = await query;
     return reply.view('tasks/index.pug', {
       tasks,
+      filter,
+      statuses,
+      users,
+      labels,
       currentUser: request.currentUser,
       flash: request.flash,
     });

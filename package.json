@@ -9,6 +9,7 @@
     "dev": "node --watch index.js",
     "build": "webpack && knex migrate:latest",
     "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --verbose --runInBand --forceExit",
+    "test:coverage": "jest --coverage",
     "db:migrate": "knex migrate:latest",
     "db:rollback": "knex migrate:rollback"
   },
@@ -36,7 +37,8 @@
     "objection": "^3.1.4",
     "passport-local": "^1.0.0",
     "pg": "^8.13.0",
-    "pug": "^3.0.0"
+    "pug": "^3.0.0",
+    "rollbar": "^3.1.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.0.0",

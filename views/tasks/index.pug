@@ -6,8 +6,36 @@ block title
 block content
   if currentUser
     a.btn.btn-primary.mt-4.mb-3(href="/tasks/new") #{t('newTaskTitle')}
+  form(action="/tasks" method="get")
+    .row.g-3.mb-3
+      .col-12.col-md-3
+        select.form-select(id="filter_statusId" name="filter[statusId]")
+          option(value="") #{t('taskStatus')}
+          each status in statuses
+            option(value=status.id selected=(filter && String(filter.statusId) === String(status.id))) #{status.name}
+      .col-12.col-md-3
+        select.form-select(id="filter_executorId" name="filter[executorId]")
+          option(value="") #{t('taskExecutor')}
+          each user in users
+            option(value=user.id selected=(filter && String(filter.executorId) === String(user.id))) #{user.fullName}
+      .col-12.col-md-3
+        select.form-select(id="filter_labelId" name="filter[labelId]")
+          option(value="") #{t('taskLabel')}
+          each label in labels
+            option(value=label.id selected=(filter && String(filter.labelId) === String(label.id))) #{label.name}
+      .col-12.col-md-3
+        .form-check.mt-2
+          input.form-check-input(
+            type="checkbox"
+            id="filter_isCreatorUser"
+            name="filter[isCreatorUser]"
+            value="1"
+            checked=(filter && filter.isCreatorUser === '1')
+          )
+          label.form-check-label(for="filter_isCreatorUser") #{t('filterIsCreatorUser')}
+    button.btn.btn-secondary(type="submit") #{t('filterShow')}
   .table-responsive
-    table.table.table-borderless.table-striped.mt-1.bg-white
+    table.table.table-borderless.table-striped.mt-3.bg-white
       thead
         tr
           th #{t('id')}

@@ -15,12 +15,14 @@ html(lang="ru")
           ul.navbar-nav.justify-content-end.w-100
             li.nav-item
               a.nav-link(href="/users") #{t('users')}
-            li.nav-item
-              a.nav-link(href="/statuses") #{t('statuses')}
-            li.nav-item
-              a.nav-link(href="/tasks") #{t('tasks')}
+            if currentUser
+              li.nav-item
+                a.nav-link(href="/statuses") #{t('statuses')}
+              li.nav-item
+                a.nav-link(href="/tasks") #{t('tasks')}
+              li.nav-item
+                a.nav-link(href="/labels") #{t('labels')}
             li.nav-item.me-auto
-              a.nav-link(href="/labels") #{t('labels')}
             if currentUser
               li.nav-item
                 a.nav-link(href=`/users/${currentUser.id}/edit`) #{currentUser.fullName}

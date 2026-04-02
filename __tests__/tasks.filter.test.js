@@ -88,7 +88,7 @@ describe('test tasks filter', () => {
   it('filter by status', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: `/tasks?filter[statusId]=${statusId}`,
+      url: `/tasks?statusId=${statusId}`,
     });
     expect(response.statusCode).toBe(200);
     expect(response.body).toContain('Task A');
@@ -98,7 +98,7 @@ describe('test tasks filter', () => {
   it('filter by executor', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: `/tasks?filter[executorId]=${executorId}`,
+      url: `/tasks?executorId=${executorId}`,
     });
     expect(response.statusCode).toBe(200);
     expect(response.body).toContain('Task B');
@@ -108,7 +108,7 @@ describe('test tasks filter', () => {
   it('filter by label', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: `/tasks?filter[labelId]=${labelId}`,
+      url: `/tasks?labelId=${labelId}`,
     });
     expect(response.statusCode).toBe(200);
     expect(response.body).toContain('Task A');
@@ -119,7 +119,7 @@ describe('test tasks filter', () => {
     const cookie = await signIn();
     const response = await app.inject({
       method: 'GET',
-      url: '/tasks?filter[isCreatorUser]=1',
+      url: '/tasks?isCreatorUser=1',
       cookies: cookie,
     });
     expect(response.statusCode).toBe(200);
@@ -130,7 +130,7 @@ describe('test tasks filter', () => {
   it('filter isCreatorUser - no effect when not logged in', async () => {
     const response = await app.inject({
       method: 'GET',
-      url: '/tasks?filter[isCreatorUser]=1',
+      url: '/tasks?isCreatorUser=1',
     });
     expect(response.statusCode).toBe(200);
   });

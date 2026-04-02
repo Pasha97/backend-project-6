@@ -1,6 +1,12 @@
 install:
 	npm ci
 
+build:
+	npm run build
+
+start:
+	npm start
+
 test:
 	npm run test
 

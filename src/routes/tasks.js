@@ -34,7 +34,7 @@ const normalizeIds = (val) => {
 
 const tasksRoutes = async (app) => {
   app.get('/tasks', async (request, reply) => {
-    const filter = request.query?.filter ?? {};
+    const filter = request.query ?? {};
 
     const [statuses, users, labels] = await Promise.all([
       TaskStatus.query().orderBy('id'),
@@ -122,8 +122,8 @@ const tasksRoutes = async (app) => {
     });
 
     const labelIds = normalizeIds(data.labelIds);
-    if (labelIds.length > 0) {
-      await task.$relatedQuery('labels').relate(labelIds);
+    for (const id of labelIds) {
+      await task.$relatedQuery('labels').relate(id);
     }
 
     request.session.flash = { type: 'success', message: t('flash.taskCreated') };
@@ -206,8 +206,9 @@ const tasksRoutes = async (app) => {
 
       await task.$relatedQuery('labels').unrelate();
       const labelIds = normalizeIds(data.labelIds);
-      if (labelIds.length > 0) {
-        await task.$relatedQuery('labels').relate(labelIds);
+      for (const id of labelIds) {
+        // eslint-disable-next-line no-await-in-loop
+        await task.$relatedQuery('labels').relate(id);
       }
 
       request.session.flash = { type: 'success', message: t('flash.taskUpdated') };

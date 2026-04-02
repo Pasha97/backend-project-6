@@ -50,10 +50,10 @@ block content
         .mb-3
           label.form-label(for="data_labelIds") #{t('taskLabels')}
           select.form-select(
-            id="data_labelIds"
+            id="data_labels"
             name="data[labelIds]"
             multiple
           )
             each label in labels
               option(value=label.id) #{label.name}
-        input.btn.btn-primary(type="submit" value=t('save'))
+        input.btn.btn-primary(type="submit" value=t('create'))

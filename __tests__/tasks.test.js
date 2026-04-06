@@ -13,7 +13,6 @@ describe('test tasks CRUD', () => {
   const testData = getTestData();
   let statusId;
   let creatorId;
-  let otherUserId;
 
   beforeAll(async () => {
     app = buildApp();
@@ -31,19 +30,19 @@ describe('test tasks CRUD', () => {
     const other = await User.query().findOne({ email: 'other@example.com' });
     if (!other) {
       const bcrypt = await import('bcryptjs');
-      const inserted = await User.query().insert({
+      await User.query().insert({
         firstName: 'Other',
         lastName: 'User',
         email: 'other@example.com',
         passwordDigest: await bcrypt.default.hash('otherpass', 10),
       });
-      otherUserId = inserted.id;
-    } else {
-      otherUserId = other.id;
     }
   });
 
-  const signIn = async (email = testData.users.existing.email, password = testData.users.existing.password) => {
+  const signIn = async (
+    email = testData.users.existing.email,
+    password = testData.users.existing.password,
+  ) => {
     const response = await app.inject({
       method: 'POST',
       url: '/session',
@@ -153,6 +152,18 @@ describe('test tasks CRUD', () => {
     expect(response.statusCode).toBe(302);
     const updated = await Task.query().findById(task.id);
     expect(updated.name).toBe('Updated task');
+  });
+
+  it('update - validation error', async () => {
+    const cookie = await signIn();
+    const task = await createTask(cookie);
+    const response = await app.inject({
+      method: 'POST',
+      url: `/tasks/${task.id}`,
+      payload: { _method: 'PATCH', data: { name: '' } },
+      cookies: cookie,
+    });
+    expect(response.statusCode).toBe(422);
   });
 
   it('delete by creator', async () => {

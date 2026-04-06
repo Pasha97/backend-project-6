@@ -1,15 +1,21 @@
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
+const migrationsDir = path.join(currentDir, 'migrations');
+
 export default {
   development: {
     client: 'better-sqlite3',
     connection: { filename: './database.sqlite3' },
     useNullAsDefault: true,
-    migrations: { tableName: 'knex_migrations' },
+    migrations: { tableName: 'knex_migrations', directory: migrationsDir },
   },
   test: {
     client: 'better-sqlite3',
     connection: ':memory:',
     useNullAsDefault: true,
-    migrations: { tableName: 'knex_migrations' },
+    migrations: { tableName: 'knex_migrations', directory: migrationsDir },
   },
   production: {
     client: 'pg',
@@ -17,6 +23,6 @@ export default {
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
     },
-    migrations: { tableName: 'knex_migrations' },
+    migrations: { tableName: 'knex_migrations', directory: migrationsDir },
   },
 };

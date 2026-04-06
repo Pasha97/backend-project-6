@@ -103,6 +103,18 @@ describe('test statuses CRUD', () => {
     expect(updated.name).toBe('Обновлённый');
   });
 
+  it('update - validation error', async () => {
+    const cookie = await signIn();
+    const [status] = await TaskStatus.query().orderBy('id');
+    const response = await app.inject({
+      method: 'POST',
+      url: `/statuses/${status.id}`,
+      payload: { _method: 'PATCH', data: { name: '' } },
+      cookies: cookie,
+    });
+    expect(response.statusCode).toBe(422);
+  });
+
   it('delete', async () => {
     const cookie = await signIn();
     const status = await TaskStatus.query().findOne({ name: 'В работе' });

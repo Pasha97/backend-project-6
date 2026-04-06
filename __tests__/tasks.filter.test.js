@@ -3,7 +3,6 @@ import {
 } from '@jest/globals';
 import buildApp from '../src/app.js';
 import db from '../src/db.js';
-import Task from '../src/models/Task.js';
 import TaskStatus from '../src/models/TaskStatus.js';
 import User from '../src/models/User.js';
 import Label from '../src/models/Label.js';
@@ -13,11 +12,8 @@ describe('test tasks filter', () => {
   let app;
   const testData = getTestData();
   let statusId;
-  let creatorId;
   let executorId;
   let labelId;
-  let taskWithLabel;
-  let taskWithExecutor;
 
   beforeAll(async () => {
     app = buildApp();
@@ -25,14 +21,24 @@ describe('test tasks filter', () => {
     await db.migrate.latest();
   });
 
+  const signIn = async (
+    email = testData.users.existing.email,
+    password = testData.users.existing.password,
+  ) => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/session',
+      payload: { data: { email, password } },
+    });
+    const [cookie] = response.cookies;
+    return { [cookie.name]: cookie.value };
+  };
+
   beforeEach(async () => {
     await prepareData();
 
     const status = await TaskStatus.query().findOne({ name: testData.statuses.existing.name });
     statusId = status.id;
-
-    const creator = await User.query().findOne({ email: testData.users.existing.email });
-    creatorId = creator.id;
 
     let executor = await User.query().findOne({ email: 'executor@example.com' });
     if (!executor) {
@@ -57,26 +63,13 @@ describe('test tasks filter', () => {
       payload: { data: { name: 'Task A', statusId, labelIds: labelId } },
       cookies: cookie,
     });
-    taskWithLabel = await Task.query().findOne({ name: 'Task A' });
-
     await app.inject({
       method: 'POST',
       url: '/tasks',
       payload: { data: { name: 'Task B', statusId, executorId } },
       cookies: cookie,
     });
-    taskWithExecutor = await Task.query().findOne({ name: 'Task B' });
   });
-
-  const signIn = async (email = testData.users.existing.email, password = testData.users.existing.password) => {
-    const response = await app.inject({
-      method: 'POST',
-      url: '/session',
-      payload: { data: { email, password } },
-    });
-    const [cookie] = response.cookies;
-    return { [cookie.name]: cookie.value };
-  };
 
   it('no filter returns all tasks', async () => {
     const response = await app.inject({ method: 'GET', url: '/tasks' });

@@ -1,10 +1,16 @@
 import 'dotenv/config';
-import buildApp from './src/app.js';
+import { fileURLToPath } from 'node:url';
+import buildApp, { init } from './src/app.js';
 
-const PORT = process.env.PORT ?? 3000;
-const HOST = process.env.HOST ?? '0.0.0.0';
+export { init };
+export default buildApp;
 
-const start = async () => {
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+
+if (isMain) {
+  const PORT = process.env.PORT ?? 3000;
+  const HOST = process.env.HOST ?? '0.0.0.0';
+
   const app = buildApp({ logger: true });
   try {
     await app.listen({ port: Number(PORT), host: HOST });
@@ -12,6 +18,4 @@ const start = async () => {
     app.log.error(err);
     process.exit(1);
   }
-};
-
-start();
+}

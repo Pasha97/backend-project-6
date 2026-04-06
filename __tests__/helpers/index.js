@@ -1,6 +1,6 @@
-import { URL } from 'url';
-import fs from 'fs';
-import path from 'path';
+import { URL } from 'node:url';
+import fs from 'node:fs';
+import path from 'node:path';
 import bcrypt from 'bcryptjs';
 import db from '../../src/db.js';
 
@@ -17,16 +17,12 @@ export const prepareData = async () => {
   await db('labels').truncate();
   await db('users').truncate();
   const users = getFixtureData('users.json');
-  for (const user of users) {
-    const { password, ...rest } = user;
+
+  await Promise.all(users.map(async ({ password, ...rest }) => {
     await db('users').insert({ ...rest, passwordDigest: await bcrypt.hash(password, 10) });
-  }
+  }));
   const statuses = getFixtureData('statuses.json');
-  for (const status of statuses) {
-    await db('task_statuses').insert(status);
-  }
+  await Promise.all(statuses.map((status) => db('task_statuses').insert(status)));
   const labels = getFixtureData('labels.json');
-  for (const label of labels) {
-    await db('labels').insert(label);
-  }
+  await Promise.all(labels.map((label) => db('labels').insert(label)));
 };

@@ -3,6 +3,7 @@ import Task from '../models/Task.js';
 import TaskStatus from '../models/TaskStatus.js';
 import User from '../models/User.js';
 import Label from '../models/Label.js';
+import { requireAuth } from './helpers.js';
 
 const t = i18next.t.bind(i18next);
 
@@ -15,15 +16,6 @@ const validate = (data) => {
     errors.statusId = ['required'];
   }
   return errors;
-};
-
-const requireAuth = (request, reply) => {
-  if (!request.currentUser) {
-    request.session.flash = { type: 'danger', message: t('flash.accessDenied') };
-    reply.redirect('/');
-    return false;
-  }
-  return true;
 };
 
 const normalizeIds = (val) => {
@@ -74,7 +66,7 @@ const tasksRoutes = async (app) => {
   });
 
   app.get('/tasks/new', async (request, reply) => {
-    if (!requireAuth(request, reply)) return;
+    if (!requireAuth(request, reply)) return null;
     const [statuses, users, labels] = await Promise.all([
       TaskStatus.query().orderBy('id'),
       User.query().orderBy('id'),
@@ -92,7 +84,7 @@ const tasksRoutes = async (app) => {
   });
 
   app.post('/tasks', async (request, reply) => {
-    if (!requireAuth(request, reply)) return;
+    if (!requireAuth(request, reply)) return null;
     const data = request.body?.data ?? {};
     const errors = validate(data);
 
@@ -122,10 +114,9 @@ const tasksRoutes = async (app) => {
     });
 
     const labelIds = normalizeIds(data.labelIds);
-    for (const id of labelIds) {
-      await task.$relatedQuery('labels').relate(id);
-    }
+    await Promise.all(labelIds.map((id) => task.$relatedQuery('labels').relate(id)));
 
+    // eslint-disable-next-line no-param-reassign
     request.session.flash = { type: 'success', message: t('flash.taskCreated') };
     return reply.redirect('/tasks');
   });
@@ -142,7 +133,7 @@ const tasksRoutes = async (app) => {
   });
 
   app.get('/tasks/:id/edit', async (request, reply) => {
-    if (!requireAuth(request, reply)) return;
+    if (!requireAuth(request, reply)) return null;
     const [task, statuses, users, labels] = await Promise.all([
       Task.query().findById(request.params.id).withGraphFetched('labels'),
       TaskStatus.query().orderBy('id'),
@@ -162,16 +153,18 @@ const tasksRoutes = async (app) => {
   });
 
   app.post('/tasks/:id', async (request, reply) => {
-    if (!requireAuth(request, reply)) return;
+    if (!requireAuth(request, reply)) return null;
     const { _method, data = {} } = request.body ?? {};
 
     if (_method === 'DELETE') {
       const task = await Task.query().findById(request.params.id);
       if (String(task.creatorId) !== String(request.currentUser.id)) {
+        // eslint-disable-next-line no-param-reassign
         request.session.flash = { type: 'danger', message: t('flash.accessDenied') };
         return reply.redirect('/tasks');
       }
       await Task.query().deleteById(request.params.id);
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'success', message: t('flash.taskDeleted') };
       return reply.redirect('/tasks');
     }
@@ -206,11 +199,9 @@ const tasksRoutes = async (app) => {
 
       await task.$relatedQuery('labels').unrelate();
       const labelIds = normalizeIds(data.labelIds);
-      for (const id of labelIds) {
-        // eslint-disable-next-line no-await-in-loop
-        await task.$relatedQuery('labels').relate(id);
-      }
+      await Promise.all(labelIds.map((id) => task.$relatedQuery('labels').relate(id)));
 
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'success', message: t('flash.taskUpdated') };
       return reply.redirect('/tasks');
     }

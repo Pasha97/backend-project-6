@@ -63,6 +63,16 @@ describe('test session', () => {
     expect(response.headers.location).toBe('/');
   });
 
+  it('sign in with non-existent email', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/session',
+      payload: { data: { email: 'nobody@example.com', password: 'whatever' } },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toContain('Неправильный емейл или пароль');
+  });
+
   afterAll(async () => {
     await app.close();
   });

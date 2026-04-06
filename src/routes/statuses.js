@@ -1,25 +1,9 @@
 import i18next from 'i18next';
 import TaskStatus from '../models/TaskStatus.js';
 import Task from '../models/Task.js';
+import { requireAuth, validateName as validate } from './helpers.js';
 
 const t = i18next.t.bind(i18next);
-
-const validate = (data) => {
-  const errors = {};
-  if (!data.name || data.name.length < 1) {
-    errors.name = ['must NOT have fewer than 1 characters'];
-  }
-  return errors;
-};
-
-const requireAuth = (request, reply) => {
-  if (!request.currentUser) {
-    request.session.flash = { type: 'danger', message: t('flash.accessDenied') };
-    reply.redirect('/');
-    return false;
-  }
-  return true;
-};
 
 const statusesRoutes = async (app) => {
   app.get('/statuses', async (request, reply) => {
@@ -32,7 +16,7 @@ const statusesRoutes = async (app) => {
   });
 
   app.get('/statuses/new', (request, reply) => {
-    if (!requireAuth(request, reply)) return;
+    if (!requireAuth(request, reply)) return null;
     return reply.view('statuses/new.pug', {
       errors: {},
       data: {},
@@ -42,7 +26,7 @@ const statusesRoutes = async (app) => {
   });
 
   app.post('/statuses', async (request, reply) => {
-    if (!requireAuth(request, reply)) return;
+    if (!requireAuth(request, reply)) return null;
     const data = request.body?.data ?? {};
     const errors = validate(data);
 
@@ -56,12 +40,13 @@ const statusesRoutes = async (app) => {
     }
 
     await TaskStatus.query().insert({ name: data.name });
+    // eslint-disable-next-line no-param-reassign
     request.session.flash = { type: 'success', message: t('flash.statusCreated') };
     return reply.redirect('/statuses');
   });
 
   app.get('/statuses/:id/edit', async (request, reply) => {
-    if (!requireAuth(request, reply)) return;
+    if (!requireAuth(request, reply)) return null;
     const status = await TaskStatus.query().findById(request.params.id);
     return reply.view('statuses/edit.pug', {
       status,
@@ -73,16 +58,18 @@ const statusesRoutes = async (app) => {
   });
 
   app.post('/statuses/:id', async (request, reply) => {
-    if (!requireAuth(request, reply)) return;
+    if (!requireAuth(request, reply)) return null;
     const { _method, data = {} } = request.body ?? {};
 
     if (_method === 'DELETE') {
       const linked = await Task.query().where('statusId', request.params.id).first();
       if (linked) {
+        // eslint-disable-next-line no-param-reassign
         request.session.flash = { type: 'danger', message: t('flash.statusDeleteError') };
         return reply.redirect('/statuses');
       }
       await TaskStatus.query().deleteById(request.params.id);
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'success', message: t('flash.statusDeleted') };
       return reply.redirect('/statuses');
     }
@@ -101,6 +88,7 @@ const statusesRoutes = async (app) => {
       }
 
       await TaskStatus.query().patchAndFetchById(request.params.id, { name: data.name });
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'success', message: t('flash.statusUpdated') };
       return reply.redirect('/statuses');
     }

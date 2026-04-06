@@ -65,6 +65,7 @@ const usersRoutes = async (app) => {
         email: data.email,
         passwordDigest,
       });
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'success', message: t('flash.userCreated') };
       return reply.redirect('/');
     } catch {
@@ -80,6 +81,7 @@ const usersRoutes = async (app) => {
   app.get('/users/:id/edit', (request, reply) => {
     const { currentUser } = request;
     if (!currentUser || String(currentUser.id) !== request.params.id) {
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'danger', message: t('flash.accessDenied') };
       return reply.redirect('/users');
     }
@@ -97,6 +99,7 @@ const usersRoutes = async (app) => {
     const { currentUser } = request;
 
     if (!currentUser || String(currentUser.id) !== request.params.id) {
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'danger', message: t('flash.accessDenied') };
       return reply.redirect('/users');
     }
@@ -107,11 +110,14 @@ const usersRoutes = async (app) => {
         .orWhere('executorId', request.params.id)
         .first();
       if (linked) {
+        // eslint-disable-next-line no-param-reassign
         request.session.flash = { type: 'danger', message: t('flash.userDeleteError') };
         return reply.redirect('/users');
       }
       await User.query().deleteById(request.params.id);
+      // eslint-disable-next-line no-param-reassign
       delete request.session.userId;
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'success', message: t('flash.userDeleted') };
       return reply.redirect('/users');
     }
@@ -139,6 +145,7 @@ const usersRoutes = async (app) => {
 
       try {
         await User.query().patchAndFetchById(request.params.id, updates);
+        // eslint-disable-next-line no-param-reassign
         request.session.flash = { type: 'success', message: t('flash.userUpdated') };
         return reply.redirect('/users');
       } catch {

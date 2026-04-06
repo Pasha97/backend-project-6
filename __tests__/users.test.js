@@ -52,7 +52,11 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/users',
-      payload: { data: { firstName: '', lastName: '', email: 'notanemail', password: 'x' } },
+      payload: {
+        data: {
+          firstName: '', lastName: '', email: 'notanemail', password: 'x',
+        },
+      },
     });
     expect(response.statusCode).toBe(422);
   });
@@ -110,14 +114,80 @@ describe('test users CRUD', () => {
     expect(updated.firstName).toBe('Updated');
   });
 
-  it('delete', async () => {
+  it('create - duplicate email', async () => {
     const { existing } = testData.users;
-    const signIn = await app.inject({
+    const response = await app.inject({
+      method: 'POST',
+      url: '/users',
+      payload: {
+        data: {
+          firstName: 'A', lastName: 'B', email: existing.email, password: 'pass123',
+        },
+      },
+    });
+    expect(response.statusCode).toBe(422);
+  });
+
+  it('update - validation error', async () => {
+    const { existing } = testData.users;
+    const signInRes = await app.inject({
       method: 'POST',
       url: '/session',
       payload: { data: existing },
     });
-    const [sessionCookie] = signIn.cookies;
+    const [sessionCookie] = signInRes.cookies;
+    const cookie = { [sessionCookie.name]: sessionCookie.value };
+    const user = await User.query().findOne({ email: existing.email });
+    const response = await app.inject({
+      method: 'POST',
+      url: `/users/${user.id}`,
+      payload: { _method: 'PATCH', data: { firstName: '', lastName: '', email: 'bad' } },
+      cookies: cookie,
+    });
+    expect(response.statusCode).toBe(422);
+  });
+
+  it('update - with password change', async () => {
+    const { existing } = testData.users;
+    const signInRes = await app.inject({
+      method: 'POST',
+      url: '/session',
+      payload: { data: existing },
+    });
+    const [sessionCookie] = signInRes.cookies;
+    const cookie = { [sessionCookie.name]: sessionCookie.value };
+    const user = await User.query().findOne({ email: existing.email });
+    const response = await app.inject({
+      method: 'POST',
+      url: `/users/${user.id}`,
+      payload: {
+        _method: 'PATCH',
+        data: {
+          firstName: 'X', lastName: 'Y', email: existing.email, password: existing.password,
+        },
+      },
+      cookies: cookie,
+    });
+    expect(response.statusCode).toBe(302);
+  });
+
+  it('update - access denied for unauthenticated', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/users/999',
+      payload: { _method: 'PATCH', data: { firstName: 'X', lastName: 'Y', email: 'x@x.com' } },
+    });
+    expect(response.statusCode).toBe(302);
+  });
+
+  it('delete', async () => {
+    const { existing } = testData.users;
+    const signInRes = await app.inject({
+      method: 'POST',
+      url: '/session',
+      payload: { data: existing },
+    });
+    const [sessionCookie] = signInRes.cookies;
     const cookie = { [sessionCookie.name]: sessionCookie.value };
 
     const user = await User.query().findOne({ email: existing.email });

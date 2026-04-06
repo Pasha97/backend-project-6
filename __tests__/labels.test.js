@@ -104,6 +104,18 @@ describe('test labels CRUD', () => {
     expect(updated.name).toBe('updated label');
   });
 
+  it('update - validation error', async () => {
+    const cookie = await signIn();
+    const [label] = await Label.query().orderBy('id');
+    const response = await app.inject({
+      method: 'POST',
+      url: `/labels/${label.id}`,
+      payload: { _method: 'PATCH', data: { name: '' } },
+      cookies: cookie,
+    });
+    expect(response.statusCode).toBe(422);
+  });
+
   it('delete', async () => {
     const cookie = await signIn();
     const label = await Label.query().findOne({ name: testData.labels.new.name });

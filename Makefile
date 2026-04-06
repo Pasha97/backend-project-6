@@ -12,3 +12,9 @@ test:
 
 test-coverage:
 	npm run test:coverage
+
+lint:
+	npx eslint .
+
+lintfix:
+	npx eslint . --fix

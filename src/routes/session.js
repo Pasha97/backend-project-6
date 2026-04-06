@@ -17,8 +17,11 @@ export default async (app) => {
   app.post('/session', async (request, reply) => {
     const body = request.body ?? {};
 
+    // eslint-disable-next-line no-underscore-dangle
     if (body._method === 'DELETE') {
+      // eslint-disable-next-line no-param-reassign
       delete request.session.userId;
+      // eslint-disable-next-line no-param-reassign
       request.session.flash = { type: 'success', message: t('flash.signedOut') };
       return reply.redirect('/');
     }
@@ -38,7 +41,9 @@ export default async (app) => {
       });
     }
 
+    // eslint-disable-next-line no-param-reassign
     request.session.userId = user.id;
+    // eslint-disable-next-line no-param-reassign
     request.session.flash = { type: 'success', message: t('flash.signedIn') };
     return reply.redirect('/');
   });

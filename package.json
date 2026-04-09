@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/app.js",
   "scripts": {
-    "start": "fastify start -i dotenv/config src/app.js",
+    "start": "node server.js",
     "dev": "fastify start -i dotenv/config --watch src/app.js",
     "build": "webpack && knex migrate:latest",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",

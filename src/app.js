@@ -99,5 +99,3 @@ const app = async (fastify, _options) => {
 };
 
 export default app;
-
-export const options = { logger: true };

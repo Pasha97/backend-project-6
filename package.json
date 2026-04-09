@@ -8,8 +8,8 @@
     "node": ">=22.x"
   },
   "scripts": {
-    "start": "fastify start -i dotenv/config src/app.js",
-    "dev": "fastify start -i dotenv/config --watch src/app.js",
+    "start": "node server.js",
+    "dev": "node --watch server.js",
     "build": "webpack && knex migrate:latest",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",

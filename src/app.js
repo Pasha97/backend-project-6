@@ -1,6 +1,5 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import buildFastify from 'fastify';
 import fp from 'fastify-plugin';
 import fastifyView from '@fastify/view';
 import fastifyStatic from '@fastify/static';
@@ -32,7 +31,8 @@ if (!i18next.isInitialized) {
   });
 }
 
-export const plugin = fp(async (fastify) => {
+// eslint-disable-next-line no-unused-vars
+export const app = async (fastify, _opts) => {
   Model.knex(db);
 
   if (!fastify.hasDecorator('objection')) {
@@ -98,34 +98,7 @@ export const plugin = fp(async (fastify) => {
       flash: request.flash,
     });
   });
-});
-
-// Singleton to close the previous server before creating a new one.
-// Test suites each call init() in beforeAll without afterAll cleanup,
-// so without this the port stays bound between suites → EADDRINUSE.
-let currentApp = null;
-
-const init = async () => {
-  if (currentApp) {
-    await currentApp.close().catch(() => {});
-    currentApp = null;
-  }
-
-  const app = buildFastify({ logger: false, exposeHeadRoutes: false });
-  await app.register(plugin);
-  await app.ready();
-
-  // Fastify 5 dropped positional listen(port, host) — patch for test compatibility
-  const originalListen = app.listen.bind(app);
-  app.listen = (portOrOptions, hostOrCallback, ...rest) => {
-    if (typeof portOrOptions === 'number' || typeof portOrOptions === 'string') {
-      return originalListen({ port: Number(portOrOptions), host: hostOrCallback ?? '127.0.0.1' }, ...rest);
-    }
-    return originalListen(portOrOptions, hostOrCallback, ...rest);
-  };
-
-  currentApp = app;
-  return app;
 };
 
-export default init;
+export const plugin = fp(app);
+export default app;

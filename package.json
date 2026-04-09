@@ -4,8 +4,11 @@
   "description": "Hexlet backend project 6",
   "type": "module",
   "main": "src/app.js",
+  "engines": {
+    "node": ">=22.x"
+  },
   "scripts": {
-    "start": "node server.js",
+    "start": "fastify start -i dotenv/config src/app.js",
     "dev": "fastify start -i dotenv/config --watch src/app.js",
     "build": "webpack && knex migrate:latest",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",

@@ -14,7 +14,9 @@ const sessionRoutes = async (app) => {
       });
     })
     .post('/session', async (request, reply) => {
-      const { _method, ...data } = request.body ?? {};
+      const rawBody = request.body ?? {};
+      const _method = rawBody._method;
+      const data = rawBody.data ?? rawBody;
 
       if (_method === 'DELETE') {
         // eslint-disable-next-line no-param-reassign

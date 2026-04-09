@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import bcrypt from 'bcryptjs';
 import fastify from 'fastify';
-import appPlugin from '../../src/app.js';
+import { plugin as appPlugin } from '../../src/app.js';
 import db from '../../src/db.js';
 
 export const buildApp = (options = {}) => {

@@ -25,7 +25,8 @@ const statusesRoutes = async (app) => {
     })
     .post('/statuses', async (request, reply) => {
       if (!requireAuth(request, reply)) return null;
-      const data = request.body ?? {};
+      const rawBody = request.body ?? {};
+      const data = rawBody.data ?? rawBody;
       const errors = validate(data);
 
       if (Object.keys(errors).length > 0) {

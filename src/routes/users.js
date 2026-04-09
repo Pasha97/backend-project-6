@@ -43,7 +43,8 @@ const usersRoutes = async (app) => {
       });
     })
     .post('/users', async (request, reply) => {
-      const data = request.body ?? {};
+      const rawBody = request.body ?? {};
+      const data = rawBody.data ?? rawBody;
       const errors = validate(data);
 
       if (Object.keys(errors).length > 0) {

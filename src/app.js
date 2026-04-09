@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Fastify from 'fastify';
+import fp from 'fastify-plugin';
 import fastifyView from '@fastify/view';
 import fastifyStatic from '@fastify/static';
 import fastifyFormbody from '@fastify/formbody';
@@ -31,7 +32,7 @@ if (!i18next.isInitialized) {
   });
 }
 
-export const plugin = async (fastify, _options) => {
+export const plugin = fp(async (fastify, _options) => {
   Model.knex(db);
 
   if (!fastify.hasDecorator('objection')) {
@@ -97,15 +98,33 @@ export const plugin = async (fastify, _options) => {
       flash: request.flash,
     });
   });
-};
+});
 
-// Factory: creates its own Fastify 5.x instance, ignoring any passed-in instance.
-// This ensures Hexlet's test environment (which imports an older fastify) doesn't
-// cause plugin version conflicts.
+// Singleton to close the previous server before creating a new one.
+// Test suites each call init() in beforeAll without afterAll cleanup,
+// so without this the port stays bound between suites → EADDRINUSE.
+let currentApp = null;
+
 const init = async (_existingApp) => {
+  if (currentApp) {
+    await currentApp.close().catch(() => {});
+    currentApp = null;
+  }
+
   const app = Fastify({ logger: false, exposeHeadRoutes: false });
   await app.register(plugin);
   await app.ready();
+
+  // Fastify 5 dropped positional listen(port, host) — patch for test compatibility
+  const originalListen = app.listen.bind(app);
+  app.listen = (portOrOptions, hostOrCallback, ...rest) => {
+    if (typeof portOrOptions === 'number' || typeof portOrOptions === 'string') {
+      return originalListen({ port: Number(portOrOptions), host: hostOrCallback ?? '127.0.0.1' }, ...rest);
+    }
+    return originalListen(portOrOptions, hostOrCallback, ...rest);
+  };
+
+  currentApp = app;
   return app;
 };
 

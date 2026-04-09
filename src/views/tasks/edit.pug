@@ -49,9 +49,9 @@ block content
             each user in users
               option(value=user.id selected=(data && String(data.executorId) === String(user.id))) #{user.fullName}
         .mb-3
-          label.form-label(for="data_labelIds") #{t('taskLabels')}
+          label.form-label(for="data_labels") #{t('taskLabels')}
           select.form-select(
-            id="data_labelIds"
+            id="data_labels"
             name="labelIds"
             multiple
           )

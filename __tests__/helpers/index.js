@@ -2,7 +2,15 @@ import { URL } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
 import bcrypt from 'bcryptjs';
+import fastify from 'fastify';
+import appPlugin from '../../src/app.js';
 import db from '../../src/db.js';
+
+export const buildApp = (options = {}) => {
+  const instance = fastify(options);
+  instance.register(appPlugin);
+  return instance;
+};
 
 const getFixturePath = (filename) => path.join('..', '..', '__fixtures__', filename);
 const readFixture = (filename) => fs.readFileSync(new URL(getFixturePath(filename), import.meta.url), 'utf-8').trim();

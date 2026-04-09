@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
+    "start": "fastify start -i dotenv/config src/app.js",
+    "dev": "fastify start -i dotenv/config --watch src/app.js",
     "build": "webpack && knex migrate:latest",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
@@ -25,7 +25,6 @@
   "dependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@fastify/cookie": "^11.0.0",
-    "bootstrap": "^5.3.0",
     "@fastify/formbody": "^8.0.0",
     "@fastify/passport": "^2.4.0",
     "@fastify/session": "^11.0.0",
@@ -33,14 +32,17 @@
     "@fastify/view": "^10.0.0",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.0.0",
+    "bootstrap": "^5.3.0",
     "dotenv": "^16.4.5",
     "fastify": "^5.0.0",
+    "fastify-cli": "^8.0.0",
     "i18next": "^23.0.0",
     "knex": "^3.1.0",
     "objection": "^3.1.4",
     "passport-local": "^1.0.0",
     "pg": "^8.13.0",
     "pug": "^3.0.0",
+    "qs": "^6.15.1",
     "rollbar": "^3.1.0"
   },
   "devDependencies": {

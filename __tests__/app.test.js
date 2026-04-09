@@ -1,7 +1,7 @@
 import {
   describe, beforeAll, afterAll, it, expect,
 } from '@jest/globals';
-import buildApp from '../src/app.js';
+import { buildApp } from './helpers/index.js';
 import db from '../src/db.js';
 import { getTestData, prepareData } from './helpers/index.js';
 
@@ -24,7 +24,7 @@ describe('test app core', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: testData.users.existing },
+      payload: testData.users.existing,
     });
     const [cookie] = response.cookies;
     return { [cookie.name]: cookie.value };
@@ -62,7 +62,7 @@ describe('test app core', () => {
       const firstResponse = await app.inject({
         method: 'POST',
         url: '/session',
-        payload: { data: { email: testData.users.existing.email, password: 'wrong' } },
+        payload: { email: testData.users.existing.email, password: 'wrong' },
         cookies: cookie,
       });
       expect(firstResponse.statusCode).toBe(200);
@@ -83,17 +83,17 @@ describe('test app core', () => {
   });
 
   describe('parseFormBody', () => {
-    it('parses bracket notation: data[key]=value', async () => {
+    it('parses flat keys', async () => {
       const response = await app.inject({
         method: 'POST',
         url: '/users',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        payload: 'data[firstName]=John&data[lastName]=Doe&data[email]=parse-test@example.com&data[password]=pass1234',
+        payload: 'firstName=John&lastName=Doe&email=parse-test@example.com&password=pass1234',
       });
       expect(response.statusCode).toBe(302);
     });
 
-    it('parses flat keys without brackets', async () => {
+    it('parses _method field', async () => {
       const response = await app.inject({
         method: 'POST',
         url: '/session',
@@ -103,18 +103,17 @@ describe('test app core', () => {
       expect(response.statusCode).toBe(302);
     });
 
-    it('parses multiple values for the same bracket key as array', async () => {
+    it('parses multiple values for the same key as array', async () => {
       const cookie = await signIn();
       const statuses = await db('task_statuses').select('id').limit(1);
       const statusId = statuses[0]?.id ?? 1;
       const users = await db('users').select('id').limit(1);
-      const executorId = users[0]?.id ?? 1;
 
       const response = await app.inject({
         method: 'POST',
         url: '/tasks',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        payload: `data[name]=TestTask&data[statusId]=${statusId}&data[executorId]=${executorId}&data[labelIds]=${statuses[0]?.id ?? 1}&data[labelIds]=${users[0]?.id ?? 1}`,
+        payload: `name=TestTask&statusId=${statusId}&labelIds=${statuses[0]?.id ?? 1}&labelIds=${users[0]?.id ?? 1}`,
         cookies: cookie,
       });
       expect([302, 422]).toContain(response.statusCode);
@@ -141,11 +140,11 @@ describe('test app core', () => {
     });
   });
 
-  describe('listen compat', () => {
-    it('accepts numeric port argument', async () => {
+  describe('listen', () => {
+    it('starts and returns address', async () => {
       const listenApp = buildApp();
       await listenApp.ready();
-      const address = await listenApp.listen(0);
+      const address = await listenApp.listen({ port: 0 });
       expect(address).toBeDefined();
       await listenApp.close();
     });

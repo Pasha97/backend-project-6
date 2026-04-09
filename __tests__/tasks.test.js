@@ -1,7 +1,7 @@
 import {
   describe, beforeAll, afterAll, beforeEach, it, expect,
 } from '@jest/globals';
-import buildApp from '../src/app.js';
+import { buildApp } from './helpers/index.js';
 import db from '../src/db.js';
 import Task from '../src/models/Task.js';
 import TaskStatus from '../src/models/TaskStatus.js';
@@ -26,7 +26,6 @@ describe('test tasks CRUD', () => {
     statusId = status.id;
     const creator = await User.query().findOne({ email: testData.users.existing.email });
     creatorId = creator.id;
-    // create a second user to test access control
     const other = await User.query().findOne({ email: 'other@example.com' });
     if (!other) {
       const bcrypt = await import('bcryptjs');
@@ -46,7 +45,7 @@ describe('test tasks CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: { email, password } },
+      payload: { email, password },
     });
     const [cookie] = response.cookies;
     return { [cookie.name]: cookie.value };
@@ -57,7 +56,7 @@ describe('test tasks CRUD', () => {
     await app.inject({
       method: 'POST',
       url: '/tasks',
-      payload: { data },
+      payload: data,
       cookies: cookie,
     });
     return Task.query().findOne({ name: data.name });
@@ -83,7 +82,7 @@ describe('test tasks CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/tasks',
-      payload: { data: { name: 'Test', statusId } },
+      payload: { name: 'Test', statusId },
     });
     expect(response.statusCode).toBe(302);
   });
@@ -94,7 +93,7 @@ describe('test tasks CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/tasks',
-      payload: { data: params },
+      payload: params,
       cookies: cookie,
     });
     expect(response.statusCode).toBe(302);
@@ -109,7 +108,7 @@ describe('test tasks CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/tasks',
-      payload: { data: { name: '' } },
+      payload: { name: '' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(422);
@@ -146,7 +145,7 @@ describe('test tasks CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/tasks/${task.id}`,
-      payload: { _method: 'PATCH', data: { name: 'Updated task', statusId } },
+      payload: { _method: 'PATCH', name: 'Updated task', statusId },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(302);
@@ -160,7 +159,7 @@ describe('test tasks CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/tasks/${task.id}`,
-      payload: { _method: 'PATCH', data: { name: '' } },
+      payload: { _method: 'PATCH', name: '' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(422);

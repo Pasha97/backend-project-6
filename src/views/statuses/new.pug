@@ -1,22 +1,22 @@
 extends ../layout.pug
 
 block title
-  | #{t('newLabelTitle')}
+  | #{t('newStatusTitle')}
 
 block content
   .row.justify-content-center
-    .col-12.col-md-8
-      form(action="/labels" method="post")
+    .col-12.col-md-6
+      form(action="/statuses" method="post")
         .form-floating.mb-3
           input.form-control(
             class=errors && errors.name ? 'is-invalid' : ''
-            id="data_name"
-            name="data[name]"
+            id="name"
+            name="name"
             value=data && data.name || ''
-            placeholder=t('labelName')
+            placeholder=t('statusName')
             type="text"
           )
           if errors && errors.name
             .invalid-feedback.form-control-feedback #{errors.name[0]}
-          label(for="data_name") #{t('labelName')}
+          label(for="name") #{t('statusName')}
         input.btn.btn-primary(type="submit" value=t('create'))

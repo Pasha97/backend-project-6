@@ -4,10 +4,11 @@ import path, { dirname } from 'node:path';
 
 // Получаем путь к текущей директории
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const mode = process.env.NODE_ENV || 'development';
 
 export default {
-  mode: 'development',
-  entry: './frontend/index.js',
+  mode,
+  entry: './src/index.js',
   output: {
     filename: 'main.js',
     path: path.resolve(__dirname, 'public', 'assets'),

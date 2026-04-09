@@ -1,7 +1,7 @@
 extends ../layout.pug
 
 block title
-  | #{t('signUpTitle')}
+  | #{t('editUserTitle')}
 
 block content
   .row.justify-content-center
@@ -11,53 +11,54 @@ block content
           .col-12.col-md-6.d-flex.align-items-center.justify-content-center
             img.rounded-circle(src="/assets/avatar.jpg" alt="avatar" onerror="this.style.display='none'")
           .col-12.col-md-6.mt-3
-            form(action="/users" method="post")
+            form(action=`/users/${user.id}` method="post")
+              input(type="hidden" name="_method" value="PATCH")
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.firstName ? 'is-invalid' : ''
-                  id="data_firstName"
-                  name="data[firstName]"
+                  id="firstName"
+                  name="firstName"
                   value=data && data.firstName || ''
                   placeholder=t('firstName')
                   type="text"
                 )
                 if errors && errors.firstName
                   .invalid-feedback.form-control-feedback #{errors.firstName[0]}
-                label(for="data_firstName") #{t('firstName')}
+                label(for="firstName") #{t('firstName')}
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.lastName ? 'is-invalid' : ''
-                  id="data_lastName"
-                  name="data[lastName]"
+                  id="lastName"
+                  name="lastName"
                   value=data && data.lastName || ''
                   placeholder=t('lastName')
                   type="text"
                 )
                 if errors && errors.lastName
                   .invalid-feedback.form-control-feedback #{errors.lastName[0]}
-                label(for="data_lastName") #{t('lastName')}
+                label(for="lastName") #{t('lastName')}
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.email ? 'is-invalid' : ''
-                  id="data_email"
-                  name="data[email]"
+                  id="email"
+                  name="email"
                   value=data && data.email || ''
                   placeholder=t('email')
                   type="text"
                 )
                 if errors && errors.email
                   .invalid-feedback.form-control-feedback #{errors.email[0]}
-                label(for="data_email") #{t('email')}
+                label(for="email") #{t('email')}
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.password ? 'is-invalid' : ''
-                  id="data_password"
-                  name="data[password]"
+                  id="password"
+                  name="password"
                   value=""
                   placeholder=t('password')
                   type="password"
                 )
                 if errors && errors.password
                   .invalid-feedback.form-control-feedback #{errors.password[0]}
-                label(for="data_password") #{t('password')}
-              input.btn.btn-primary(type="submit" value=t('save'))
+                label(for="password") #{t('password')}
+              input.btn.btn-primary(type="submit" value=t('editButton'))

@@ -15,25 +15,25 @@ block content
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.email ? 'is-invalid' : ''
-                  id="data_email"
-                  name="data[email]"
+                  id="email"
+                  name="email"
                   value=data && data.email || ''
                   placeholder=t('email')
                   type="text"
                 )
                 if errors && errors.email
                   .invalid-feedback.form-control-feedback #{errors.email[0]}
-                label(for="data_email") #{t('email')}
+                label(for="email") #{t('email')}
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.password ? 'is-invalid' : ''
-                  id="data_password"
-                  name="data[password]"
+                  id="password"
+                  name="password"
                   value=""
                   placeholder=t('password')
                   type="password"
                 )
                 if errors && errors.password
                   .invalid-feedback.form-control-feedback #{errors.password[0]}
-                label(for="data_password") #{t('password')}
+                label(for="password") #{t('password')}
               input.btn.btn-primary(type="submit" value=t('signInButton'))

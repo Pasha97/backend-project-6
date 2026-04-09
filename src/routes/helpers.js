@@ -4,8 +4,7 @@ const t = i18next.t.bind(i18next);
 
 export const requireAuth = (request, reply) => {
   if (!request.currentUser) {
-    // eslint-disable-next-line no-param-reassign
-    request.session.flash = { type: 'danger', message: t('flash.accessDenied') };
+    request.setFlash('danger', t('flash.accessDenied'));
     reply.redirect('/');
     return false;
   }

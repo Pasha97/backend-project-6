@@ -1,7 +1,7 @@
 import {
   describe, beforeAll, afterAll, it, expect,
 } from '@jest/globals';
-import buildApp from '../src/app.js';
+import { buildApp } from './helpers/index.js';
 import db from '../src/db.js';
 import User from '../src/models/User.js';
 import { getTestData, prepareData } from './helpers/index.js';
@@ -38,7 +38,7 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/users',
-      payload: { data: params },
+      payload: params,
     });
     expect(response.statusCode).toBe(302);
     const user = await User.query().findOne({ email: params.email });
@@ -53,9 +53,7 @@ describe('test users CRUD', () => {
       method: 'POST',
       url: '/users',
       payload: {
-        data: {
-          firstName: '', lastName: '', email: 'notanemail', password: 'x',
-        },
+        firstName: '', lastName: '', email: 'notanemail', password: 'x',
       },
     });
     expect(response.statusCode).toBe(422);
@@ -66,7 +64,7 @@ describe('test users CRUD', () => {
     const signIn = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: existing },
+      payload: existing,
     });
     const [sessionCookie] = signIn.cookies;
     const cookie = { [sessionCookie.name]: sessionCookie.value };
@@ -94,7 +92,7 @@ describe('test users CRUD', () => {
     const signIn = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: existing },
+      payload: existing,
     });
     const [sessionCookie] = signIn.cookies;
     const cookie = { [sessionCookie.name]: sessionCookie.value };
@@ -103,10 +101,7 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/users/${user.id}`,
-      payload: {
-        _method: 'PATCH',
-        data: { firstName: 'Updated', lastName: 'Name', email: existing.email },
-      },
+      payload: { _method: 'PATCH', firstName: 'Updated', lastName: 'Name', email: existing.email },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(302);
@@ -120,9 +115,7 @@ describe('test users CRUD', () => {
       method: 'POST',
       url: '/users',
       payload: {
-        data: {
-          firstName: 'A', lastName: 'B', email: existing.email, password: 'pass123',
-        },
+        firstName: 'A', lastName: 'B', email: existing.email, password: 'pass123',
       },
     });
     expect(response.statusCode).toBe(422);
@@ -133,7 +126,7 @@ describe('test users CRUD', () => {
     const signInRes = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: existing },
+      payload: existing,
     });
     const [sessionCookie] = signInRes.cookies;
     const cookie = { [sessionCookie.name]: sessionCookie.value };
@@ -141,7 +134,7 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/users/${user.id}`,
-      payload: { _method: 'PATCH', data: { firstName: '', lastName: '', email: 'bad' } },
+      payload: { _method: 'PATCH', firstName: '', lastName: '', email: 'bad' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(422);
@@ -152,7 +145,7 @@ describe('test users CRUD', () => {
     const signInRes = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: existing },
+      payload: existing,
     });
     const [sessionCookie] = signInRes.cookies;
     const cookie = { [sessionCookie.name]: sessionCookie.value };
@@ -162,9 +155,10 @@ describe('test users CRUD', () => {
       url: `/users/${user.id}`,
       payload: {
         _method: 'PATCH',
-        data: {
-          firstName: 'X', lastName: 'Y', email: existing.email, password: existing.password,
-        },
+        firstName: 'X',
+        lastName: 'Y',
+        email: existing.email,
+        password: existing.password,
       },
       cookies: cookie,
     });
@@ -175,7 +169,7 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/users/999',
-      payload: { _method: 'PATCH', data: { firstName: 'X', lastName: 'Y', email: 'x@x.com' } },
+      payload: { _method: 'PATCH', firstName: 'X', lastName: 'Y', email: 'x@x.com' },
     });
     expect(response.statusCode).toBe(302);
   });
@@ -185,7 +179,7 @@ describe('test users CRUD', () => {
     const signInRes = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: existing },
+      payload: existing,
     });
     const [sessionCookie] = signInRes.cookies;
     const cookie = { [sessionCookie.name]: sessionCookie.value };

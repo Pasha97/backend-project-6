@@ -1,7 +1,7 @@
 import {
   describe, beforeAll, afterAll, beforeEach, it, expect,
 } from '@jest/globals';
-import buildApp from '../src/app.js';
+import { buildApp } from './helpers/index.js';
 import db from '../src/db.js';
 import TaskStatus from '../src/models/TaskStatus.js';
 import User from '../src/models/User.js';
@@ -28,7 +28,7 @@ describe('test tasks filter', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: { email, password } },
+      payload: { email, password },
     });
     const [cookie] = response.cookies;
     return { [cookie.name]: cookie.value };
@@ -60,13 +60,13 @@ describe('test tasks filter', () => {
     await app.inject({
       method: 'POST',
       url: '/tasks',
-      payload: { data: { name: 'Task A', statusId, labelIds: labelId } },
+      payload: { name: 'Task A', statusId, labelIds: labelId },
       cookies: cookie,
     });
     await app.inject({
       method: 'POST',
       url: '/tasks',
-      payload: { data: { name: 'Task B', statusId, executorId } },
+      payload: { name: 'Task B', statusId, executorId },
       cookies: cookie,
     });
   });

@@ -1,7 +1,7 @@
 import {
   describe, beforeAll, afterAll, it, expect,
 } from '@jest/globals';
-import buildApp from '../src/app.js';
+import { buildApp } from './helpers/index.js';
 import db from '../src/db.js';
 import TaskStatus from '../src/models/TaskStatus.js';
 import { getTestData, prepareData } from './helpers/index.js';
@@ -21,7 +21,7 @@ describe('test statuses CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: testData.users.existing },
+      payload: testData.users.existing,
     });
     const [cookie] = response.cookies;
     return { [cookie.name]: cookie.value };
@@ -49,7 +49,7 @@ describe('test statuses CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/statuses',
-      payload: { data: params },
+      payload: params,
       cookies: cookie,
     });
     expect(response.statusCode).toBe(302);
@@ -63,7 +63,7 @@ describe('test statuses CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/statuses',
-      payload: { data: { name: '' } },
+      payload: { name: '' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(422);
@@ -73,7 +73,7 @@ describe('test statuses CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/statuses',
-      payload: { data: { name: 'Test' } },
+      payload: { name: 'Test' },
     });
     expect(response.statusCode).toBe(302);
   });
@@ -95,7 +95,7 @@ describe('test statuses CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/statuses/${status.id}`,
-      payload: { _method: 'PATCH', data: { name: 'Обновлённый' } },
+      payload: { _method: 'PATCH', name: 'Обновлённый' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(302);
@@ -109,7 +109,7 @@ describe('test statuses CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/statuses/${status.id}`,
-      payload: { _method: 'PATCH', data: { name: '' } },
+      payload: { _method: 'PATCH', name: '' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(422);

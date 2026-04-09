@@ -1,7 +1,7 @@
 import {
   describe, beforeAll, afterAll, it, expect,
 } from '@jest/globals';
-import buildApp from '../src/app.js';
+import { buildApp } from './helpers/index.js';
 import db from '../src/db.js';
 import Label from '../src/models/Label.js';
 import TaskStatus from '../src/models/TaskStatus.js';
@@ -22,7 +22,7 @@ describe('test labels CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/session',
-      payload: { data: testData.users.existing },
+      payload: testData.users.existing,
     });
     const [cookie] = response.cookies;
     return { [cookie.name]: cookie.value };
@@ -50,7 +50,7 @@ describe('test labels CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/labels',
-      payload: { data: params },
+      payload: params,
       cookies: cookie,
     });
     expect(response.statusCode).toBe(302);
@@ -64,7 +64,7 @@ describe('test labels CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/labels',
-      payload: { data: { name: '' } },
+      payload: { name: '' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(422);
@@ -74,7 +74,7 @@ describe('test labels CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/labels',
-      payload: { data: { name: 'Test' } },
+      payload: { name: 'Test' },
     });
     expect(response.statusCode).toBe(302);
   });
@@ -96,7 +96,7 @@ describe('test labels CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/labels/${label.id}`,
-      payload: { _method: 'PATCH', data: { name: 'updated label' } },
+      payload: { _method: 'PATCH', name: 'updated label' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(302);
@@ -110,7 +110,7 @@ describe('test labels CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/labels/${label.id}`,
-      payload: { _method: 'PATCH', data: { name: '' } },
+      payload: { _method: 'PATCH', name: '' },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(422);
@@ -136,7 +136,7 @@ describe('test labels CRUD', () => {
     await app.inject({
       method: 'POST',
       url: '/labels',
-      payload: { data: { name: 'linked-label' } },
+      payload: { name: 'linked-label' },
       cookies: cookie,
     });
     const label = await Label.query().findOne({ name: 'linked-label' });
@@ -145,7 +145,7 @@ describe('test labels CRUD', () => {
     await app.inject({
       method: 'POST',
       url: '/tasks',
-      payload: { data: { name: 'Task with label', statusId: status.id, labelIds: label.id } },
+      payload: { name: 'Task with label', statusId: status.id, labelIds: label.id },
       cookies: cookie,
     });
 

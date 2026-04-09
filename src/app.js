@@ -106,9 +106,19 @@ export const app = async (fastify, _opts) => {
 export const plugin = fp(app);
 
 // eslint-disable-next-line no-unused-vars
-const init = async (_externalInstance, opts = {}) => {
+const init = async (_externalInstance, opts) => {
   const fastify = buildFastify({ logger: true, ...opts });
   await app(fastify, opts);
+
+  const originalListen = fastify.listen.bind(fastify);
+  // eslint-disable-next-line no-param-reassign
+  fastify.listen = (portOrOpts, host, ...rest) => {
+    if (typeof portOrOpts === 'number') {
+      return originalListen({ port: portOrOpts, host }, ...rest);
+    }
+    return originalListen(portOrOpts, host, ...rest);
+  };
+
   return fastify;
 };
 

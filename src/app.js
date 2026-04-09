@@ -105,6 +105,7 @@ export const app = async (fastify, _opts) => {
 
 export const plugin = fp(app);
 
+// eslint-disable-next-line no-unused-vars
 const init = async (_externalInstance, opts = {}) => {
   const fastify = buildFastify({ logger: true, ...opts });
   await app(fastify, opts);

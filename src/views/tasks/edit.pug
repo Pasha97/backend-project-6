@@ -11,7 +11,7 @@ block content
         .form-floating.mb-3
           input.form-control(
             class=errors && errors.name ? 'is-invalid' : ''
-            id="name"
+            id="data_name"
             name="name"
             value=data && data.name || ''
             placeholder=t('taskName')
@@ -19,19 +19,19 @@ block content
           )
           if errors && errors.name
             .invalid-feedback.form-control-feedback #{errors.name[0]}
-          label(for="name") #{t('taskName')}
+          label(for="data_name") #{t('taskName')}
         .mb-3
-          label.form-label(for="description") #{t('taskDescription')}
+          label.form-label(for="data_description") #{t('taskDescription')}
           textarea.form-control(
-            id="description"
+            id="data_description"
             name="description"
             rows="3"
           ) #{data && data.description || ''}
         .mb-3
-          label.form-label(for="statusId") #{t('taskStatus')}
+          label.form-label(for="data_statusId") #{t('taskStatus')}
           select.form-select(
             class=errors && errors.statusId ? 'is-invalid' : ''
-            id="statusId"
+            id="data_statusId"
             name="statusId"
           )
             option(value="") ---
@@ -40,18 +40,18 @@ block content
           if errors && errors.statusId
             .invalid-feedback #{errors.statusId[0]}
         .mb-3
-          label.form-label(for="executorId") #{t('taskExecutor')}
+          label.form-label(for="data_executorId") #{t('taskExecutor')}
           select.form-select(
-            id="executorId"
+            id="data_executorId"
             name="executorId"
           )
             option(value="") ---
             each user in users
               option(value=user.id selected=(data && String(data.executorId) === String(user.id))) #{user.fullName}
         .mb-3
-          label.form-label(for="labelIds") #{t('taskLabels')}
+          label.form-label(for="data_labelIds") #{t('taskLabels')}
           select.form-select(
-            id="labelIds"
+            id="data_labelIds"
             name="labelIds"
             multiple
           )

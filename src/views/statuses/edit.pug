@@ -11,7 +11,7 @@ block content
         .form-floating.mb-3
           input.form-control(
             class=errors && errors.name ? 'is-invalid' : ''
-            id="name"
+            id="data_name"
             name="name"
             value=data && data.name || ''
             placeholder=t('statusName')
@@ -19,5 +19,5 @@ block content
           )
           if errors && errors.name
             .invalid-feedback.form-control-feedback #{errors.name[0]}
-          label(for="name") #{t('statusName')}
+          label(for="data_name") #{t('statusName')}
         input.btn.btn-primary(type="submit" value=t('editButton'))

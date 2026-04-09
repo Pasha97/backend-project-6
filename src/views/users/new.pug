@@ -15,7 +15,7 @@ block content
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.firstName ? 'is-invalid' : ''
-                  id="firstName"
+                  id="data_firstName"
                   name="firstName"
                   value=data && data.firstName || ''
                   placeholder=t('firstName')
@@ -23,11 +23,11 @@ block content
                 )
                 if errors && errors.firstName
                   .invalid-feedback.form-control-feedback #{errors.firstName[0]}
-                label(for="firstName") #{t('firstName')}
+                label(for="data_firstName") #{t('firstName')}
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.lastName ? 'is-invalid' : ''
-                  id="lastName"
+                  id="data_lastName"
                   name="lastName"
                   value=data && data.lastName || ''
                   placeholder=t('lastName')
@@ -35,11 +35,11 @@ block content
                 )
                 if errors && errors.lastName
                   .invalid-feedback.form-control-feedback #{errors.lastName[0]}
-                label(for="lastName") #{t('lastName')}
+                label(for="data_lastName") #{t('lastName')}
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.email ? 'is-invalid' : ''
-                  id="email"
+                  id="data_email"
                   name="email"
                   value=data && data.email || ''
                   placeholder=t('email')
@@ -47,11 +47,11 @@ block content
                 )
                 if errors && errors.email
                   .invalid-feedback.form-control-feedback #{errors.email[0]}
-                label(for="email") #{t('email')}
+                label(for="data_email") #{t('email')}
               .form-floating.mb-3
                 input.form-control(
                   class=errors && errors.password ? 'is-invalid' : ''
-                  id="password"
+                  id="data_password"
                   name="password"
                   value=""
                   placeholder=t('password')
@@ -59,5 +59,5 @@ block content
                 )
                 if errors && errors.password
                   .invalid-feedback.form-control-feedback #{errors.password[0]}
-                label(for="password") #{t('password')}
+                label(for="data_password") #{t('password')}
               input.btn.btn-primary(type="submit" value=t('save'))

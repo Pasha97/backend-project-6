@@ -1,9 +1,8 @@
 import {
   describe, beforeAll, afterAll, it, expect,
 } from '@jest/globals';
-import { buildApp } from './helpers/index.js';
+import { buildApp, getTestData, prepareData } from './helpers/index.js';
 import db from '../src/db.js';
-import { getTestData, prepareData } from './helpers/index.js';
 
 describe('test app core', () => {
   let app;

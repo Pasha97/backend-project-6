@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import Fastify from 'fastify';
+import buildFastify from 'fastify';
 import fp from 'fastify-plugin';
 import fastifyView from '@fastify/view';
 import fastifyStatic from '@fastify/static';
@@ -32,7 +32,7 @@ if (!i18next.isInitialized) {
   });
 }
 
-export const plugin = fp(async (fastify, _options) => {
+export const plugin = fp(async (fastify) => {
   Model.knex(db);
 
   if (!fastify.hasDecorator('objection')) {
@@ -105,13 +105,13 @@ export const plugin = fp(async (fastify, _options) => {
 // so without this the port stays bound between suites → EADDRINUSE.
 let currentApp = null;
 
-const init = async (_existingApp) => {
+const init = async () => {
   if (currentApp) {
     await currentApp.close().catch(() => {});
     currentApp = null;
   }
 
-  const app = Fastify({ logger: false, exposeHeadRoutes: false });
+  const app = buildFastify({ logger: false, exposeHeadRoutes: false });
   await app.register(plugin);
   await app.ready();
 

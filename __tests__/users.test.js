@@ -1,10 +1,9 @@
 import {
   describe, beforeAll, afterAll, it, expect,
 } from '@jest/globals';
-import { buildApp } from './helpers/index.js';
+import { buildApp, getTestData, prepareData } from './helpers/index.js';
 import db from '../src/db.js';
 import User from '../src/models/User.js';
-import { getTestData, prepareData } from './helpers/index.js';
 
 describe('test users CRUD', () => {
   let app;
@@ -101,7 +100,9 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/users/${user.id}`,
-      payload: { _method: 'PATCH', firstName: 'Updated', lastName: 'Name', email: existing.email },
+      payload: {
+        _method: 'PATCH', firstName: 'Updated', lastName: 'Name', email: existing.email,
+      },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(302);
@@ -134,7 +135,9 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: `/users/${user.id}`,
-      payload: { _method: 'PATCH', firstName: '', lastName: '', email: 'bad' },
+      payload: {
+        _method: 'PATCH', firstName: '', lastName: '', email: 'bad',
+      },
       cookies: cookie,
     });
     expect(response.statusCode).toBe(422);
@@ -169,7 +172,9 @@ describe('test users CRUD', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/users/999',
-      payload: { _method: 'PATCH', firstName: 'X', lastName: 'Y', email: 'x@x.com' },
+      payload: {
+        _method: 'PATCH', firstName: 'X', lastName: 'Y', email: 'x@x.com',
+      },
     });
     expect(response.statusCode).toBe(302);
   });

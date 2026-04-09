@@ -15,7 +15,7 @@ const sessionRoutes = async (app) => {
     })
     .post('/session', async (request, reply) => {
       const rawBody = request.body ?? {};
-      const _method = rawBody._method;
+      const { _method } = rawBody;
       const data = rawBody.data ?? rawBody;
 
       if (_method === 'DELETE') {

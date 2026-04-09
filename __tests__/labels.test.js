@@ -1,11 +1,10 @@
 import {
   describe, beforeAll, afterAll, it, expect,
 } from '@jest/globals';
-import { buildApp } from './helpers/index.js';
+import { buildApp, getTestData, prepareData } from './helpers/index.js';
 import db from '../src/db.js';
 import Label from '../src/models/Label.js';
 import TaskStatus from '../src/models/TaskStatus.js';
-import { getTestData, prepareData } from './helpers/index.js';
 
 describe('test labels CRUD', () => {
   let app;

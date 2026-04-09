@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import Fastify from 'fastify';
 import fastifyView from '@fastify/view';
 import fastifyStatic from '@fastify/static';
 import fastifyFormbody from '@fastify/formbody';
@@ -30,7 +31,7 @@ if (!i18next.isInitialized) {
   });
 }
 
-const app = async (fastify, _options) => {
+export const plugin = async (fastify, _options) => {
   Model.knex(db);
 
   if (!fastify.hasDecorator('objection')) {
@@ -96,8 +97,16 @@ const app = async (fastify, _options) => {
       flash: request.flash,
     });
   });
-
-  return fastify;
 };
 
-export default app;
+// Factory: creates its own Fastify 5.x instance, ignoring any passed-in instance.
+// This ensures Hexlet's test environment (which imports an older fastify) doesn't
+// cause plugin version conflicts.
+const init = async (_existingApp) => {
+  const app = Fastify({ logger: false, exposeHeadRoutes: false });
+  await app.register(plugin);
+  await app.ready();
+  return app;
+};
+
+export default init;

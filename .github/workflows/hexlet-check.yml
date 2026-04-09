@@ -18,6 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v3
+        with:
+          node-version: '24'
+
       - name: Hexlet project check
         uses: hexlet/project-action@release
         with:

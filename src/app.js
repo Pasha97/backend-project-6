@@ -98,6 +98,8 @@ export const app = async (fastify, _opts) => {
       flash: request.flash,
     });
   });
+
+  return fastify;
 };
 
 export const plugin = fp(app);

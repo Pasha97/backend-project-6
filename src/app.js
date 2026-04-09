@@ -96,6 +96,8 @@ const app = async (fastify, _options) => {
       flash: request.flash,
     });
   });
+
+  return fastify;
 };
 
 export default app;

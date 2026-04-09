@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import buildFastify from 'fastify';
 import fp from 'fastify-plugin';
 import fastifyView from '@fastify/view';
 import fastifyStatic from '@fastify/static';
@@ -103,4 +104,11 @@ export const app = async (fastify, _opts) => {
 };
 
 export const plugin = fp(app);
-export default app;
+
+const init = async (_externalInstance, opts = {}) => {
+  const fastify = buildFastify({ logger: true, ...opts });
+  await app(fastify, opts);
+  return fastify;
+};
+
+export default init;
